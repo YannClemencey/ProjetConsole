@@ -9,6 +9,10 @@ try
 {
     socket.Connect(endpoint);
 
+    Thread t = new Thread(LireMessages);
+    t.IsBackground = true;
+    t.Start(socket);
+
     while (true)
     {
         string? message = Console.ReadLine();
@@ -38,4 +42,19 @@ finally
 
     socket.Close();
 }
-
+void LireMessages(object? obj)
+{
+        if(obj is Socket socket)
+    {
+        while (true)
+        {
+            byte[] buffer = new byte[4096];
+            int read = socket.Receive(buffer);
+            if (read > 0)
+            {
+                var message = Encoding.UTF8.GetString(buffer, 0, read);
+                Console.WriteLine(message);
+            }
+        }
+    }
+}
